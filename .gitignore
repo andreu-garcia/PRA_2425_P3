@@ -17,3 +17,6 @@ bin/
 # Archivos temporales
 *~
 *.tmp
+
+# Makefile
+Makefile
