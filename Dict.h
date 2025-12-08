@@ -6,10 +6,10 @@
 template <typename V> 
 class Dict {
     public:
-        void instert(std::string key, V value);
-        V search (std::string key);
-        V remove (std::string key);
-        int entries();
+        virtual void instert(std::string key, V value);
+        virtual V search (std::string key);
+        virtual V remove (std::string key);
+        virtual int entries();
 };
 
 #endif

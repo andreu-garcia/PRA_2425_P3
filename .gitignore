@@ -1,0 +1,19 @@
+# Ignorar carpeta bin (ejecutables, objetos, etc.)
+bin/
+
+# Archivos generados por make
+*.o
+*.out
+*.exe
+*.a
+*.so
+*.gch
+*.d
+
+# Archivos de dependencias
+*.dSYM/
+*.mod
+
+# Archivos temporales
+*~
+*.tmp
