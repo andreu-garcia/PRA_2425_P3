@@ -6,7 +6,7 @@
 #include "Dict.h"
 #include "TableEntry.h"
 
-#include "../"  
+#include "ListLinked.h"  
 
 template <typename V>
 class HashTable: public Dict<V> {
@@ -14,7 +14,7 @@ class HashTable: public Dict<V> {
     private:
         int n;
         int max;
-        listLinked<TableEntry<V>>* table;
+        ListLinked<TableEntry<V>>* table;
         int h(std::string key){
 
             int suma=0;
@@ -30,55 +30,71 @@ class HashTable: public Dict<V> {
             
             this ->n =0;
             this -> max = size;
-            tabla = new listLinked<TableEntry<V>>[max];
+            table = new ListLinked<TableEntry<V>>[max];
             
         }
         ~HashTable(){
-            delete[]tabla;
+            delete[]table;
         }
         int capacity(){
-            return n;
+            return max;
         }
-        friend std::ostream& operator<<(std::ostram &out,const HashTable<V> &th){
+
+        friend std::ostream& operator<<(std::ostream &out,const HashTable<V> &th){
             
-            for (int i=0;i<th.n;i++){
+            for (int i=0;i<th.max;i++){
                 out<<i<<" : "<<th.table[i]<<std::endl;
             }
             return out;
         }
-        V search(std::strink key){
+        V search(const std::string key)override{
 
-            for (int i=0 ; i<th.max ; i++){
-                if (th.table[i].key==h(key)){
-                    return th.table[i].value;
-
-                }
+            int index= h(key);
+            int pos = table[index].search(key);
+            if (pos == -1){
+                throw std::runtime_error("La key no existix perro");
             }
-            throw std::runetime_error("La key no existix perro"):
+            return table[index].get(pos).value;
         }
 
-        V operator[](std::string key){
+        V remove(const std::string key) override{
+
+            int index = h(key);
+            TableEntry<V>te(key);
+            int pos = table[index].search(te);
+            if (pos != -1){
+                TableEntry<V> removedEntry = table[index].get(pos);
+                table[index].remove(pos);
+                n--;
+                return te.value;
+            }
+            throw std::runtime_error("La key no existix perro");   
+        }
+    
+        
+
+        V operator[](const std::string  &key){
 
             return (this->search(key));
         }
 
-        void insert(std::string &key, V &value){
-
-            if (n<max){
-                int index = h(key);
-                if (this->search(key)==key){
-
-                    throw std::runetime_error("Esta clau ja existix puto troll");
-                }
-                else{
-                    
-                    TableEntry<V>te(key,value);
-                    tabla[index].append(te);
-                }
-
+        void insert(const std::string key,V value)override{
+            int index = h(key);
+            TableEntry<V>te(key,value);
+            int pos = table[index].search(te);
+            if (pos != -1){
+                throw std::runtime_error("Esta clau ja existix puto troll");
             }
+            table[index].append(te);
+            n++;
+        }
+        int entries(){
+            
+            return n;
 
         }
+
+
         
 };
 
