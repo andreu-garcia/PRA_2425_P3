@@ -4,6 +4,7 @@
 #include <ostream>
 #include <stdexcept>
 #include "BSNode.h"
+#include <functional>
 
 template <typename T> 
 class BSTree {
@@ -22,20 +23,26 @@ class BSTree {
                 return search(n -> right, e);
             }
         }
-        BSNode<T>*insert(BSNode<T>*n, T e){
+        BSNode<T>* insert(BSNode<T>* n, T e) {
 
-            if(e==n->elem){
-                throw std::runtime_error("Ja esta l'element perro");
-            }
-            if (n == nullptr){
-                n = new BSNode<T>(e);
-            } else if (e < n -> elem){
-                n -> left = insert(n -> left, e);
-            } else {
-                n -> right = insert(n -> right, e);
-            }
-            return n;
+        if (n == nullptr) {
+            return new BSNode<T>(e, nullptr, nullptr);
         }
+
+        else if(e == n->elem) {
+            throw std::runtime_error("Ja esta l'element, perro");
+        }
+        else if (e < n->elem) {
+            n->left = insert(n->left, e);
+        }
+        else {
+            n->right = insert(n->right, e);
+        }
+
+        return n;
+        }
+    
+
         void print_inorder(std::ostream &out, BSNode<T>* n) const{
             if (n != nullptr){
                 print_inorder(out, n -> left);
@@ -61,7 +68,7 @@ class BSTree {
                     delete n;
                     return temp;
                 }
-                BSNode<T>* temp = minValueNode(n -> right);
+                BSNode<T>* temp = n -> right;
                 n -> elem = temp -> elem;
                 n -> right = remove(n -> right, temp -> elem);
             }
@@ -95,71 +102,47 @@ class BSTree {
                 delete n;
             }
         }
-
+        
 
 
     public:
+        BSTree(){
+            nelem = 0;
+            root = nullptr;
+        }
+
+        int size() const{
+            return nelem;
+        }
+
         T search(T e){
-            BSNode<T>* current = root;
-            while (current != nullptr){
-                if (e == current -> elem){
-                    return current -> elem;
-                } else if (e < current -> elem){
-                    current = current -> left;
-                } else {
-                    current = current -> right;
-                }
+            BSNode<T>* result = search(root, e);
+            if (result == nullptr){
+                throw std::runtime_error("L'element no esta en l abre troll");
             }
-            throw std::runtime_error("L'element no esta en l abre troll");
+            return result -> elem;
 
         }
         T operator[](T e){
             return search(e);
         }
         void insert(T e){
-            BSNode<T>* newNode = new BSNode<T>(e);
-            if (root == nullptr){
-                root = newNode;
-            } else {
-                BSNode<T>* current = root;
-                BSNode<T>* parent = nullptr;
-                while (true){
-                    parent = current;
-                    if (e < current -> elem){
-                        current = current -> left;
-                        if (current == nullptr){
-                            parent -> left = newNode;
-                            break;
-                        }
-                    } else {
-                        current = current -> right;
-                        if (current == nullptr){
-                            parent -> right = newNode;
-                            break;
-                        }
-                    }
-                }
-            }
+            root = insert(root, e);
             nelem++;
         }
 
         friend std::ostream& operator<<(std::ostream &out, const BSTree<T> &bst){
-            std::function<void(BSNode<T>*)> inOrder = [&](BSNode<T>* node) {
-                if (node != nullptr) {
-                    inOrder(node->left);
-                    out << node->elem << " ";
-                    inOrder(node->right);
-                }
-            };
-            inOrder(bst.root);
+            bst.print_inorder(out, bst.root);
             return out;
         }
         void remove(T e){
-            root = removeRec(root, e);
+            root = remove(root, e);
         }
-        ~BSTree(){}
+        ~BSTree(){
+            delete_cascade(root);
+        }
 
     
-}
+};
 
 #endif
